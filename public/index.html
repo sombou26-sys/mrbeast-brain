@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr B's Brain — Viral Video Analyzer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --red: #ff0000;
+    --yellow: #ffd700;
+    --dark: #0a0a0a;
+    --card: #111;
+    --card2: #181818;
+    --border: #222;
+    --text: #fff;
+    --muted: #888;
+    --green: #00ff88;
+    --orange: #ff6b00;
+  }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a0000 0%, #0a0a0a 50%, #001a0a 100%);
+    border-bottom: 2px solid var(--red);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+  }
+
+  .header h1 span.beast { color: var(--red); }
+  .header h1 span.brain { color: var(--yellow); }
+
+  .header p {
+    color: var(--muted);
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .input-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  input[type="text"], select {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"] { flex: 1; }
+  input[type="text"]:focus { border-color: var(--red); }
+
+  select {
+    min-width: 180px;
+    cursor: pointer;
+  }
+
+  select:focus { border-color: var(--yellow); }
+
+  .analyze-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .analyze-btn:hover { background: #cc0000; transform: translateY(-1px); }
+  .analyze-btn:disabled { background: #444; cursor: not-allowed; transform: none; }
+
+  .hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    display: none;
+  }
+
+  .loading.active { display: block; }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading p { color: var(--muted); }
+  .loading .loading-step {
+    color: var(--yellow);
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Results */
+  .results { display: none; }
+  .results.active { display: block; }
+
+  /* Video card */
+  .video-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .video-thumb {
+    width: 200px;
+    min-width: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .video-thumb img {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+  }
+
+  .video-info h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .video-meta { color: var(--muted); font-size: 0.85rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  /* Score hero */
+  .score-hero {
+    background: linear-gradient(135deg, #1a0000, #0a0a0a);
+    border: 1px solid var(--red);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .viral-score-number {
+    font-size: 6rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .grade-badge {
+    display: inline-block;
+    padding: 0.4rem 1.5rem;
+    border-radius: 100px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+  }
+
+  .verdict {
+    color: #ccc;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Score grid */
+  .scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+
+  .score-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .score-card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+
+  .score-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .score-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  .score-analysis {
+    font-size: 0.82rem;
+    color: #aaa;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .score-fix {
+    font-size: 0.82rem;
+    color: var(--yellow);
+    line-height: 1.5;
+    border-left: 2px solid var(--yellow);
+    padding-left: 0.75rem;
+  }
+
+  /* Section */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--red);
+    border-radius: 2px;
+  }
+
+  .top-killers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .killer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #1a0000;
+    border: 1px solid #330000;
+    border-radius: 8px;
+    padding: 0.875rem;
+  }
+
+  .killer-num {
+    background: var(--red);
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .killer-text { font-size: 0.9rem; line-height: 1.5; }
+
+  /* Title rewrite */
+  .title-rewrite {
+    background: #001a00;
+    border: 1px solid #003300;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    line-height: 1.4;
+  }
+
+  .original-title {
+    background: #1a0000;
+    border: 1px solid #330000;
+    border-radius: 8px;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
+    color: #ff6666;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  /* Blueprint */
+  .blueprint {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .blueprint-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .blueprint-ts {
+    background: #1a1a1a;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 0.5px;
+  }
+
+  .blueprint-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .blueprint-current, .blueprint-beast {
+    padding: 0.875rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .blueprint-current {
+    background: #0d0d0d;
+    color: #aaa;
+    border-right: 1px solid var(--border);
+  }
+
+  .blueprint-beast {
+    background: #001500;
+    color: #88ff88;
+  }
+
+  .blueprint-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+    opacity: 0.6;
+  }
+
+  /* Wow factor / niche */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+
+  .info-card-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .info-card-value {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* Thumbnail direction */
+  .thumb-direction {
+    background: #001520;
+    border: 1px solid #003040;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    color: #88ccff;
+    line-height: 1.6;
+  }
+
+  /* Error */
+  .error-box {
+    background: #1a0000;
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    padding: 1.5rem;
+    color: #ff8888;
+    display: none;
+  }
+
+  .error-box.active { display: block; }
+
+  /* Color helpers */
+  .score-0 { color: #ff4444; }
+  .score-1 { color: #ff4444; }
+  .score-2 { color: #ff6644; }
+  .score-3 { color: #ff8844; }
+  .score-4 { color: #ffaa44; }
+  .score-5 { color: #ffcc44; }
+  .score-6 { color: #ffdd44; }
+  .score-7 { color: #ddee44; }
+  .score-8 { color: #88dd44; }
+  .score-9 { color: #44cc66; }
+  .score-10 { color: var(--green); }
+
+  .bar-low { background: #ff4444; }
+  .bar-mid { background: var(--yellow); }
+  .bar-high { background: var(--green); }
+
+  .grade-S { background: #ffd700; color: #000; }
+  .grade-A { background: #00cc66; color: #000; }
+  .grade-B { background: #4488ff; color: #fff; }
+  .grade-C { background: #ff8800; color: #fff; }
+  .grade-D { background: #ff4444; color: #fff; }
+  .grade-F { background: #aa0000; color: #fff; }
+
+  @media (max-width: 640px) {
+    .input-row { flex-direction: column; }
+    .video-card { flex-direction: column; }
+    .video-thumb { width: 100%; min-width: unset; }
+    .info-grid { grid-template-columns: 1fr; }
+    .blueprint-body { grid-template-columns: 1fr; }
+    .blueprint-current { border-right: none; border-bottom: 1px solid var(--border); }
+    .viral-score-number { font-size: 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="beast">Mr B's </span><span class="brain">Brain</span></h1>
+  <p>Viral video analyzer — powered by the viral video formula</p>
+</div>
+
+<div class="container">
+  <!-- DEMO SECTION -->
+  <div id="demoSection" style="margin-bottom:2rem;">
+    <div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.5rem;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+        <span style="background:#ff0000;color:#fff;padding:0.25rem 0.75rem;border-radius:100px;font-size:0.75rem;font-weight:700;letter-spacing:1px;">LIVE EXAMPLE</span>
+        <span style="color:#888;font-size:0.85rem;">See what a full analysis looks like — paste your own URL above to run one</span>
+      </div>
+      <!-- Demo video card -->
+      <div style="display:flex;gap:1.5rem;align-items:flex-start;padding:1rem;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;margin-bottom:1rem;">
+        <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" style="width:160px;min-width:160px;border-radius:8px;" />
+        <div>
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;">Rick Astley - Never Gonna Give You Up (4K Remaster)</div>
+          <div style="color:#888;font-size:0.85rem;">👤 Rick Astley &nbsp;|&nbsp; 👁 1,754,970,166 views &nbsp;|&nbsp; ⏱ 3:33</div>
+        </div>
+      </div>
+      <!-- Score hero -->
+      <div style="background:linear-gradient(135deg,#1a0000,#0a0a0a);border:1px solid #ff0000;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem;">
+        <div style="font-size:5rem;font-weight:900;color:#ffd700;line-height:1;">75</div>
+        <div style="color:#ffd700;margin-bottom:0.5rem;font-size:1rem;font-weight:600;">/ 100 Viral Score</div>
+        <span style="background:#4488ff;color:#fff;padding:0.4rem 1.5rem;border-radius:100px;font-size:1.5rem;font-weight:900;">B</span>
+        <p style="color:#ccc;font-size:0.95rem;line-height:1.6;max-width:600px;margin:1rem auto 0;">Solid viral DNA baked in from cultural ubiquity alone — but it coasts on nostalgia rather than engineering genuine retention. Stakes are near-zero and escalation is absent.</p>
+      </div>
+      <!-- Score grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;margin-bottom:1rem;">
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Title Strength</span><span style="font-size:1.3rem;font-weight:900;color:#ddee44;">8/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:80%;background:#ddee44;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Clear and recognizable but relies on existing brand — no curiosity gap for new viewers.</p>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Thumbnail Power</span><span style="font-size:1.3rem;font-weight:900;color:#ffcc44;">7/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:70%;background:#ffcc44;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Human face + emotion present, but no shock or curiosity. Generic for a non-fan.</p>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Hook Execution</span><span style="font-size:1.3rem;font-weight:900;color:#00ff88;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#00ff88;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Iconic opening. Instant recognition. Maximum front-loaded energy. ✅</p>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Wow Factor</span><span style="font-size:1.3rem;font-weight:900;color:#ddee44;">8/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:80%;background:#ddee44;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Cultural phenomenon status. But only ONE creator can do this — and it only works once.</p>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Crazy Progression</span><span style="font-size:1.3rem;font-weight:900;color:#ffcc44;">7/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:70%;background:#ffcc44;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Straight progression. No escalation, no stages, no increasing stakes.</p>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Ending</span><span style="font-size:1.3rem;font-weight:900;color:#00ff88;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#00ff88;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Abrupt peak-energy ending. Promise kept. Contract honored. ✅</p>
+        </div>
+      </div>
+      <!-- Title rewrite -->
+      <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.75rem;">Title Rewrite</div>
+        <div style="background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem 1rem;font-size:0.9rem;color:#ff6666;text-decoration:line-through;opacity:0.7;margin-bottom:0.5rem;">ORIGINAL: Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)</div>
+        <div style="background:#001a00;border:1px solid #003300;border-radius:8px;padding:0.75rem 1rem;font-size:1rem;font-weight:700;color:#00ff88;">MR B VERSION: I BROKE the World Record for Most Views on a Music Video — Here's How</div>
+      </div>
+      <!-- Top killers -->
+      <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.75rem;">Top Viral Killers</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
+            <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">1</div>
+            <div style="font-size:0.88rem;">Low stakes — no clear challenge or goal for the viewer to invest in</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
+            <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">2</div>
+            <div style="font-size:0.88rem;">Zero escalation — same energy start to finish, no reason to keep watching</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
+            <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">3</div>
+            <div style="font-size:0.88rem;">Missed re-engagement at 3min — viewer attention clock resets without a new hook</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="input-section">
+    <div class="input-row">
+      <div style="display:flex;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">▶ YouTube</span>
+        <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">♪ TikTok</span>
+        <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">◈ Instagram</span>
+        <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">✕ X / Twitter</span>
+      </div>
+      <input type="text" id="urlInput" placeholder="Paste a YouTube, TikTok, Instagram or X video URL..." />
+      <select id="nicheSelect">
+        <option value="">Auto-detect niche</option>
+        <option value="Crypto/Web3">Crypto / Web3</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Finance/Investing">Finance / Investing</option>
+        <option value="Fitness/Health">Fitness / Health</option>
+        <option value="Cooking/Food">Cooking / Food</option>
+        <option value="Tech/Gadgets">Tech / Gadgets</option>
+        <option value="Education">Education</option>
+        <option value="Vlog/Lifestyle">Vlog / Lifestyle</option>
+        <option value="Comedy/Entertainment">Comedy / Entertainment</option>
+        <option value="Business/Entrepreneurship">Business / Entrepreneurship</option>
+        <option value="Travel">Travel</option>
+        <option value="Science">Science</option>
+        <option value="Sports">Sports</option>
+      </select>
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">ANALYZE</button>
+    </div>
+    <p class="hint">Works with YouTube, TikTok, Instagram &amp; X (Twitter) videos. Scores against the viral formula. Gets brutal.</p>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Running Mr B Brain...</p>
+    <p class="loading-step" id="loadingStep">Fetching video data...</p>
+  </div>
+
+  <div class="results" id="results">
+
+    <div class="video-card" id="videoCard"></div>
+
+    <div class="score-hero" id="scoreHero"></div>
+
+    <div class="scores-grid" id="scoresGrid"></div>
+
+    <div class="info-grid" id="infoGrid"></div>
+
+    <div class="section" id="titleSection"></div>
+
+    <div class="section" id="killersSection"></div>
+
+    <div class="section" id="blueprintSection"></div>
+
+    <div class="section" id="nicheSection"></div>
+
+  </div>
+
+</div>
+
+<script>
+const SCORE_LABELS = {
+  titleStrength: 'Title Strength',
+  thumbnailPower: 'Thumbnail Power',
+  hookExecution: 'Hook (0-1min)',
+  crazyProgression: 'Crazy Progression',
+  reEngagement3min: 'Re-hook at 3min',
+  storyInvestment: 'Story Investment',
+  halfwayReEngagement: 'Halfway Re-hook',
+  backHalfQuality: 'Back Half Quality',
+  ending: 'Ending',
+  wowFactor: 'Wow Factor'
+};
+
+async function analyze() {
+  const url = document.getElementById('urlInput').value.trim();
+  const niche = document.getElementById('nicheSelect').value;
+  
+  if (!url) { showError('Please paste a YouTube URL'); return; }
+  
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('analyzeBtn').disabled = true;
+  
+  const steps = [
+    'Fetching video data...',
+    'Extracting title, thumbnail, metadata...',
+    'Running Mr B Brain analysis...',
+    'Scoring all 10 dimensions...',
+    'Building your viral blueprint...'
+  ];
+  let si = 0;
+  const stepEl = document.getElementById('loadingStep');
+  const stepInterval = setInterval(() => {
+    si = (si + 1) % steps.length;
+    stepEl.textContent = steps[si];
+  }, 1800);
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, niche })
+    });
+    
+    const data = await res.json();
+    clearInterval(stepInterval);
+    document.getElementById('loading').classList.remove('active');
+    
+    if (!res.ok || data.error) {
+      showError(data.error || 'Analysis failed');
+      return;
+    }
+    
+    renderResults(data);
+    
+  } catch(e) {
+    clearInterval(stepInterval);
+    document.getElementById('loading').classList.remove('active');
+    showError('Network error: ' + e.message);
+  } finally {
+    document.getElementById('analyzeBtn').disabled = false;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('active');
+}
+
+function scoreColor(s) {
+  if (s >= 9) return 'score-10';
+  if (s >= 8) return 'score-8';
+  if (s >= 7) return 'score-7';
+  if (s >= 6) return 'score-6';
+  if (s >= 5) return 'score-5';
+  if (s >= 4) return 'score-4';
+  if (s >= 3) return 'score-3';
+  return 'score-1';
+}
+
+function barColor(s) {
+  if (s >= 8) return 'bar-high';
+  if (s >= 5) return 'bar-mid';
+  return 'bar-low';
+}
+
+function viralColor(score) {
+  if (score >= 85) return '#ffd700';
+  if (score >= 70) return '#00ff88';
+  if (score >= 55) return '#88ff44';
+  if (score >= 40) return '#ffcc44';
+  if (score >= 25) return '#ff8844';
+  return '#ff4444';
+}
+
+function renderResults(data) {
+  const a = data.analysis;
+  
+  // Video card
+  document.getElementById('videoCard').innerHTML = `
+    <div class="video-thumb">
+      <img src="${data.thumbnail}" alt="thumbnail" onerror="this.src='https://img.youtube.com/vi/${data.videoId}/hqdefault.jpg'">
+    </div>
+    <div class="video-info">
+      <h2>${data.title}</h2>
+      <div class="video-meta">
+        <span>👤 ${data.author}</span>
+        ${data.viewCount ? `<span>👁 ${data.viewCount} views</span>` : ''}
+        ${data.duration ? `<span>⏱ ${data.duration}</span>` : ''}
+      </div>
+    </div>
+  `;
+
+  // Score hero
+  const vColor = viralColor(a.viralScore);
+  document.getElementById('scoreHero').innerHTML = `
+    <div class="viral-score-number" style="color:${vColor}">${a.viralScore}</div>
+    <div style="color:${vColor};margin-bottom:0.5rem;font-size:1rem;font-weight:600">/ 100 Viral Score</div>
+    <span class="grade-badge grade-${a.grade}">${a.grade}</span>
+    <p class="verdict">${a.verdict}</p>
+  `;
+
+  // Scores grid
+  const sg = document.getElementById('scoresGrid');
+  sg.innerHTML = '';
+  if (a.scores) {
+    for (const [key, val] of Object.entries(a.scores)) {
+      const label = SCORE_LABELS[key] || key;
+      const s = val.score;
+      sg.innerHTML += `
+        <div class="score-card">
+          <div class="score-card-header">
+            <span class="score-card-title">${label}</span>
+            <span class="score-number ${scoreColor(s)}">${s}/10</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill ${barColor(s)}" style="width:${s*10}%"></div></div>
+          <p class="score-analysis">${val.analysis}</p>
+          ${val.fix && s < 8 ? `<p class="score-fix">→ ${val.fix}</p>` : ''}
+        </div>
+      `;
+    }
+  }
+
+  // Info grid
+  document.getElementById('infoGrid').innerHTML = `
+    <div class="info-card">
+      <div class="info-card-label">⚡ Wow Factor</div>
+      <div class="info-card-value">${a.wowFactor || 'Not identified'}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">🎯 Stakes</div>
+      <div class="info-card-value">${a.stakes || 'Not assessed'}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">📜 Promise Made</div>
+      <div class="info-card-value">${a.promise || 'N/A'}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">✅ Promise Kept</div>
+      <div class="info-card-value" style="color:${a.promiseKept ? 'var(--green)' : '#ff4444'};font-weight:700;">
+        ${a.promiseKept ? '✅ YES — Contract honored' : '❌ NO — Contract broken'}
+      </div>
+    </div>
+  `;
+
+  // Title rewrite
+  document.getElementById('titleSection').innerHTML = `
+    <div class="section-title">Title Rewrite</div>
+    <div class="original-title">ORIGINAL: ${data.title}</div>
+    <div class="title-rewrite">MR B'S VERSION: ${a.titleRewrite || 'N/A'}</div>
+    ${a.thumbnailDirection ? `
+      <div style="margin-top:1rem;">
+        <div class="section-title" style="margin-bottom:0.5rem">Thumbnail Direction</div>
+        <div class="thumb-direction">${a.thumbnailDirection}</div>
+      </div>
+    ` : ''}
+  `;
+
+  // Top killers
+  const killers = a.topKillers || [];
+  let killersHtml = '<div class="top-killers">';
+  killers.forEach((k, i) => {
+    killersHtml += `
+      <div class="killer-item">
+        <div class="killer-num">${i+1}</div>
+        <div class="killer-text">${k}</div>
+      </div>
+    `;
+  });
+  killersHtml += '</div>';
+  document.getElementById('killersSection').innerHTML = `
+    <div class="section-title">Top Viral Killers</div>
+    ${killersHtml}
+  `;
+
+  // Blueprint
+  const bp = a.blueprintFix || [];
+  let bpHtml = '<div class="blueprint">';
+  bp.forEach(item => {
+    bpHtml += `
+      <div class="blueprint-item">
+        <div class="blueprint-ts">${item.timestamp}</div>
+        <div class="blueprint-body">
+          <div class="blueprint-current">
+            <div class="blueprint-label">Current</div>
+            ${item.current}
+          </div>
+          <div class="blueprint-beast">
+            <div class="blueprint-label">Mr B's Version</div>
+            ${item.mrbeastVersion}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  bpHtml += '</div>';
+  document.getElementById('blueprintSection').innerHTML = `
+    <div class="section-title">Second-by-Second Blueprint Fix</div>
+    ${bpHtml}
+  `;
+
+  // Niche translation
+  document.getElementById('nicheSection').innerHTML = `
+    <div class="section-title">Mr B's Niche Translation</div>
+    <p style="font-size:0.95rem;line-height:1.7;color:#ccc;">${a.nicheTranslation || 'N/A'}</p>
+  `;
+
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Allow Enter key
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') analyze();
+});
+</script>
+
+
+  <!-- FOOTER -->
+  <footer style="text-align:center;padding:2rem 1rem 2.5rem;border-top:1px solid #1a1a1a;margin-top:3rem;">
+    <p style="color:#444;font-size:0.82rem;margin-bottom:0.4rem;">
+      © 2026 Mr B's Brain. All rights reserved.
+    </p>
+    <p style="color:#333;font-size:0.8rem;">
+      Built by 
+      <a href="https://x.com/Masked_gamin" target="_blank" rel="noopener" 
+         style="color:#555;text-decoration:none;font-weight:600;transition:color 0.2s;"
+         onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#555'">
+        @Masked_gamin
+      </a>
+      &nbsp;on X
+    </p>
+  </footer>
+</body>
+</html>
