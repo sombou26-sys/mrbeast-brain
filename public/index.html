@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mr B's Brain — Viral Video Analyzer</title>
+<title>Mr B's Coaches — Viral Video Analyzer</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
@@ -497,6 +497,46 @@
     .blueprint-current { border-right: none; border-bottom: 1px solid var(--border); }
     .viral-score-number { font-size: 4rem; }
   }
+
+  /* ── YouTube Connect Bar ── */
+  .yt-bar { display:flex; align-items:center; gap:1rem; background:#111; border:1px solid #222; border-radius:10px; padding:0.875rem 1.25rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .yt-bar .badge { font-size:0.75rem; font-weight:700; letter-spacing:1px; padding:0.25rem 0.75rem; border-radius:100px; }
+  .yt-connect-btn { background:var(--red); color:#fff; border:none; padding:0.5rem 1.25rem; border-radius:7px; font-weight:700; font-size:0.85rem; cursor:pointer; transition:background 0.15s; }
+  .yt-connect-btn:hover { background:#cc0000; }
+  .yt-connected-badge { background:#001a00; border:1px solid #003300; color:#00ff88; font-size:0.82rem; font-weight:700; padding:0.35rem 0.9rem; border-radius:100px; }
+  .yt-disconnect { background:none; border:1px solid #333; color:#666; font-size:0.78rem; padding:0.3rem 0.7rem; border-radius:6px; cursor:pointer; margin-left:0.5rem; }
+  .yt-disconnect:hover { border-color:#ff4444; color:#ff4444; }
+
+  /* ── Tabs ── */
+  .tabs { display:flex; gap:0; margin-bottom:-1px; }
+  .tab-btn { background:#0a0a0a; border:1px solid #222; border-bottom:none; color:#888; padding:0.6rem 1.25rem; font-size:0.85rem; font-weight:600; cursor:pointer; border-radius:8px 8px 0 0; transition:all 0.15s; }
+  .tab-btn.active { background:#111; color:#fff; border-color:#333; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  /* ── Retention Curve ── */
+  .retention-section { background:#111; border:1px solid #222; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+  .retention-section .section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#888; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+  .retention-section .section-title::before { content:''; display:inline-block; width:3px; height:14px; background:var(--red); border-radius:2px; }
+  #retentionChart { width:100%; height:160px; display:block; }
+  .retention-insights { display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem; }
+  .ri-card { background:#1a0000; border:1px solid #330000; border-radius:8px; padding:0.875rem 1rem; }
+  .ri-header { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.4rem; }
+  .ri-ts { background:var(--red); color:#fff; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:4px; }
+  .ri-drop { color:#ff6666; font-size:0.8rem; font-weight:700; }
+  .ri-diagnosis { font-size:0.85rem; color:#bbb; line-height:1.5; margin-bottom:0.4rem; }
+  .ri-fix { font-size:0.83rem; color:var(--yellow); border-left:2px solid var(--yellow); padding-left:0.75rem; line-height:1.5; }
+
+  /* ── Screenshot upload ── */
+  .upload-zone { border:2px dashed #333; border-radius:10px; padding:2rem; text-align:center; cursor:pointer; transition:border-color 0.2s; position:relative; }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--red); }
+  .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-zone p { color:#666; font-size:0.9rem; pointer-events:none; }
+  .upload-zone .file-name { color:#00ff88; font-size:0.85rem; margin-top:0.5rem; }
+  .platform-sel { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .platform-btn { background:#111; border:1px solid #333; color:#aaa; padding:0.4rem 1rem; border-radius:7px; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+  .platform-btn.active { border-color:var(--red); color:#fff; background:#1a0000; }
+
 </style>
 </head>
 <body>
@@ -512,77 +552,83 @@
     <div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.5rem;margin-bottom:1rem;">
       <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
         <span style="background:#ff0000;color:#fff;padding:0.25rem 0.75rem;border-radius:100px;font-size:0.75rem;font-weight:700;letter-spacing:1px;">LIVE EXAMPLE</span>
-        <span style="color:#888;font-size:0.85rem;">See what a full analysis looks like — paste your own URL above to run one</span>
+        <span style="color:#888;font-size:0.85rem;">Real analysis — Mr B&#39;s #1 most-viewed video ever. Paste your own URL above to run one.</span>
       </div>
       <!-- Demo video card -->
       <div style="display:flex;gap:1.5rem;align-items:flex-start;padding:1rem;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;margin-bottom:1rem;">
-        <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" style="width:160px;min-width:160px;border-radius:8px;" />
+        <img src="https://img.youtube.com/vi/48h57PspBec/maxresdefault.jpg" style="width:160px;min-width:160px;border-radius:8px;" />
         <div>
-          <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;">Rick Astley - Never Gonna Give You Up (4K Remaster)</div>
-          <div style="color:#888;font-size:0.85rem;">👤 Rick Astley &nbsp;|&nbsp; 👁 1,754,970,166 views &nbsp;|&nbsp; ⏱ 3:33</div>
+          <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;">$1 vs $1,000,000,000 Yacht!</div>
+          <div style="color:#888;font-size:0.85rem;">👤 Mr B &nbsp;|&nbsp; 🏆 #1 Most Viewed Mr B Video</div>
         </div>
       </div>
       <!-- Score hero -->
-      <div style="background:linear-gradient(135deg,#1a0000,#0a0a0a);border:1px solid #ff0000;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem;">
-        <div style="font-size:5rem;font-weight:900;color:#ffd700;line-height:1;">75</div>
-        <div style="color:#ffd700;margin-bottom:0.5rem;font-size:1rem;font-weight:600;">/ 100 Viral Score</div>
-        <span style="background:#4488ff;color:#fff;padding:0.4rem 1.5rem;border-radius:100px;font-size:1.5rem;font-weight:900;">B</span>
-        <p style="color:#ccc;font-size:0.95rem;line-height:1.6;max-width:600px;margin:1rem auto 0;">Solid viral DNA baked in from cultural ubiquity alone — but it coasts on nostalgia rather than engineering genuine retention. Stakes are near-zero and escalation is absent.</p>
+      <div style="background:linear-gradient(135deg,#001a00,#0a0a0a);border:1px solid #00cc66;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem;">
+        <div style="font-size:5rem;font-weight:900;color:#00ff88;line-height:1;">80</div>
+        <div style="color:#00ff88;margin-bottom:0.5rem;font-size:1rem;font-weight:600;">/ 100 Viral Score</div>
+        <span style="background:#00cc66;color:#000;padding:0.4rem 1.5rem;border-radius:100px;font-size:1.5rem;font-weight:900;">A</span>
+        <p style="color:#ccc;font-size:0.95rem;line-height:1.6;max-width:600px;margin:1rem auto 0;">Strong viral DNA. The title, thumbnail, and structure closely follow the proven formula for viral success on YouTube. Promise kept. Contract honored.</p>
       </div>
       <!-- Score grid -->
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;margin-bottom:1rem;">
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Title Strength</span><span style="font-size:1.3rem;font-weight:900;color:#ddee44;">8/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:80%;background:#ddee44;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Clear and recognizable but relies on existing brand — no curiosity gap for new viewers.</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Title Strength</span><span style="font-size:1.3rem;font-weight:900;color:#44cc66;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#44cc66;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Extremely clear, specific, taps a curiosity gap. The $1 vs $1,000,000,000 contrast is inherently attention-grabbing and sets up high stakes instantly.</p>
         </div>
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Thumbnail Power</span><span style="font-size:1.3rem;font-weight:900;color:#ffcc44;">7/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:70%;background:#ffcc44;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Human face + emotion present, but no shock or curiosity. Generic for a non-fan.</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Thumbnail Power</span><span style="font-size:1.3rem;font-weight:900;color:#44cc66;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#44cc66;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Clear dominant emotion (shock/disbelief), bold readable text, high contrast. Perfectly aligned with the title&#39;s extreme scale promise.</p>
         </div>
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Hook Execution</span><span style="font-size:1.3rem;font-weight:900;color:#00ff88;">9/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#00ff88;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Iconic opening. Instant recognition. Maximum front-loaded energy. ✅</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Hook (0–1min)</span><span style="font-size:1.3rem;font-weight:900;color:#00ff88;">10/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:100%;background:#00ff88;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Jumps straight into the $1B yacht in the first 30 seconds. Frenetic pace, quick cuts, maximum front-loaded energy. Executed flawlessly. ✅</p>
         </div>
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Wow Factor</span><span style="font-size:1.3rem;font-weight:900;color:#ddee44;">8/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:80%;background:#ddee44;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Cultural phenomenon status. But only ONE creator can do this — and it only works once.</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Wow Factor</span><span style="font-size:1.3rem;font-weight:900;color:#44cc66;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#44cc66;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">The extreme scale comparison between $1 and a $1B yacht is jaw-dropping. Very few creators on Earth could pull this off.</p>
         </div>
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Crazy Progression</span><span style="font-size:1.3rem;font-weight:900;color:#ffcc44;">7/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:70%;background:#ffcc44;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Straight progression. No escalation, no stages, no increasing stakes.</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Story Investment</span><span style="font-size:1.3rem;font-weight:900;color:#44cc66;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#44cc66;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Builds investment in characters rapidly while continuously escalating stakes. No dull moments. Viewer is on the edge of their seat.</p>
         </div>
         <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Ending</span><span style="font-size:1.3rem;font-weight:900;color:#00ff88;">9/10</span></div>
-          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#00ff88;border-radius:2px;"></div></div>
-          <p style="font-size:0.8rem;color:#aaa;">Abrupt peak-energy ending. Promise kept. Contract honored. ✅</p>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;">Ending</span><span style="font-size:1.3rem;font-weight:900;color:#44cc66;">9/10</span></div>
+          <div style="height:4px;background:#222;border-radius:2px;margin-bottom:0.5rem;"><div style="height:100%;width:90%;background:#44cc66;border-radius:2px;"></div></div>
+          <p style="font-size:0.8rem;color:#aaa;">Ends abruptly at peak action. Viewer left with strong satisfaction and craving more. Promise kept in full. ✅</p>
         </div>
+      </div>
+      <!-- Promise kept badge -->
+      <div style="background:#001a00;border:1px solid #003300;border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.75rem;">
+        <span style="font-size:1.2rem;">✅</span>
+        <span style="font-size:0.9rem;font-weight:700;color:#00ff88;">Promise Kept — Contract Honored</span>
+        <span style="font-size:0.85rem;color:#888;margin-left:auto;">Title promised extreme scale. Video delivered.</span>
       </div>
       <!-- Title rewrite -->
       <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
         <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.75rem;">Title Rewrite</div>
-        <div style="background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem 1rem;font-size:0.9rem;color:#ff6666;text-decoration:line-through;opacity:0.7;margin-bottom:0.5rem;">ORIGINAL: Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)</div>
-        <div style="background:#001a00;border:1px solid #003300;border-radius:8px;padding:0.75rem 1rem;font-size:1rem;font-weight:700;color:#00ff88;">MR B VERSION: I BROKE the World Record for Most Views on a Music Video — Here's How</div>
+        <div style="background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem 1rem;font-size:0.9rem;color:#ff6666;text-decoration:line-through;opacity:0.7;margin-bottom:0.5rem;">ORIGINAL: $1 vs $1,000,000,000 Yacht!</div>
+        <div style="background:#001a00;border:1px solid #003300;border-radius:8px;padding:0.75rem 1rem;font-size:1rem;font-weight:700;color:#00ff88;">MR B&#39;S VERSION: I Spent $1 vs $1,000,000,000 on a Yacht and This Happened...</div>
       </div>
       <!-- Top killers -->
       <div style="background:#111;border:1px solid #222;border-radius:10px;padding:1rem;">
-        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.75rem;">Top Viral Killers</div>
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.75rem;">Top Viral Killers (Even for the #1 Video)</div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
             <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">1</div>
-            <div style="font-size:0.88rem;">Low stakes — no clear challenge or goal for the viewer to invest in</div>
+            <div style="font-size:0.88rem;">Missing a jaw-dropping re-hook moment at exactly the 3-minute mark</div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
             <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">2</div>
-            <div style="font-size:0.88rem;">Zero escalation — same energy start to finish, no reason to keep watching</div>
+            <div style="font-size:0.88rem;">No final 10-second twist to leave the viewer truly awestruck at the very end</div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#1a0000;border:1px solid #330000;border-radius:8px;padding:0.75rem;">
             <div style="background:#ff0000;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">3</div>
-            <div style="font-size:0.88rem;">Missed re-engagement at 3min — viewer attention clock resets without a new hook</div>
+            <div style="font-size:0.88rem;">Could push the &quot;wow factor&quot; even further — few other creators can, but Mr B can</div>
           </div>
         </div>
       </div>
@@ -590,7 +636,28 @@
   </div>
 
 
-  <div class="input-section">
+  <!-- YouTube Connect Bar -->
+  <div class="yt-bar" id="ytBar">
+    <div id="ytDisconnectedState" style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+      <span class="badge" style="background:#1a0000;color:#ff6666;border:1px solid #330000;">NOT CONNECTED</span>
+      <span style="color:#888;font-size:0.85rem;">Connect YouTube Studio for <strong style="color:#fff">real retention curve</strong> analysis</span>
+      <button class="yt-connect-btn" onclick="connectYouTube()">🔗 Connect YouTube</button>
+      <span style="color:#444;font-size:0.78rem;">Read-only · Your own videos only</span>
+    </div>
+    <div id="ytConnectedState" style="display:none;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+      <span class="yt-connected-badge">✅ YouTube Studio connected</span>
+      <span style="color:#888;font-size:0.85rem;">Real retention data enabled</span>
+      <button class="yt-disconnect" onclick="disconnectYouTube()">Disconnect</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('url',this)">▶ Paste URL</button>
+    <button class="tab-btn" onclick="switchTab('screenshot',this)">📸 Upload Analytics Screenshot</button>
+  </div>
+
+  <div class="input-section" style="border-radius:0 12px 12px 12px;">
     <div class="input-row">
       <div style="display:flex;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;">
         <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">▶ YouTube</span>
@@ -598,7 +665,7 @@
         <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">◈ Instagram</span>
         <span style="background:#111;border:1px solid #333;border-radius:100px;padding:0.3rem 0.9rem;font-size:0.78rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:0.4rem;">✕ X / Twitter</span>
       </div>
-      <input type="text" id="urlInput" placeholder="Paste a YouTube, TikTok, Instagram or X video URL..." />
+      <input type="text" id="urlInput" placeholder="Paste a YouTube, TikTok, Instagram, X or Facebook video URL..." />
       <select id="nicheSelect">
         <option value="">Auto-detect niche</option>
         <option value="Crypto/Web3">Crypto / Web3</option>
@@ -617,14 +684,47 @@
       </select>
       <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">ANALYZE</button>
     </div>
-    <p class="hint">Works with YouTube, TikTok, Instagram &amp; X (Twitter) videos. Scores against the viral formula. Gets brutal.</p>
+    <p class="hint">Works with YouTube, TikTok, Instagram, X &amp; Facebook videos. Scores against the viral formula. Gets brutal.</p>
+  </div>
+
+
+  <!-- Screenshot Tab Pane -->
+  <div class="tab-pane input-section" id="screenshotPane" style="border-radius:0 12px 12px 12px;display:none;">
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:0.5rem;">Platform</div>
+      <div class="platform-sel">
+        <button class="platform-btn active" data-platform="tiktok" onclick="selectPlatform(this)">♪ TikTok</button>
+        <button class="platform-btn" data-platform="instagram" onclick="selectPlatform(this)">◈ Instagram</button>
+        <button class="platform-btn" data-platform="facebook" onclick="selectPlatform(this)">f Facebook</button>
+      </div>
+    </div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="screenshotFile" accept="image/*" onchange="fileSelected(this)">
+      <p>📊 Drop your analytics screenshot here<br><span style="font-size:0.8rem;color:#444;">TikTok Studio · Instagram Insights · Facebook Creator Studio</span></p>
+      <div class="file-name" id="fileName"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+      <select id="screenshotNiche" style="background:#0a0a0a;border:1px solid #222;color:#fff;padding:0.75rem 1rem;border-radius:8px;font-size:0.9rem;flex:1;min-width:160px;">
+        <option value="">Auto-detect niche</option>
+        <option value="Crypto/Web3">Crypto / Web3</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Finance/Investing">Finance / Investing</option>
+        <option value="Fitness/Health">Fitness / Health</option>
+        <option value="Cooking/Food">Cooking / Food</option>
+        <option value="Tech/Gadgets">Tech / Gadgets</option>
+        <option value="Comedy/Entertainment">Comedy / Entertainment</option>
+        <option value="Business/Entrepreneurship">Business / Entrepreneurship</option>
+      </select>
+      <button class="analyze-btn" onclick="analyzeScreenshot()">ANALYZE SCREENSHOT</button>
+    </div>
+    <p class="hint" style="margin-top:0.75rem;">Upload a screenshot from your analytics dashboard. We extract the retention curve and run the full viral formula analysis.</p>
   </div>
 
   <div class="error-box" id="errorBox"></div>
 
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p>Running Mr B Brain...</p>
+    <p>Running Mr B's Coaches analysis...</p>
     <p class="loading-step" id="loadingStep">Fetching video data...</p>
   </div>
 
@@ -633,6 +733,17 @@
     <div class="video-card" id="videoCard"></div>
 
     <div class="score-hero" id="scoreHero"></div>
+
+
+    <!-- Retention Curve (shown only when real data exists) -->
+    <div class="retention-section" id="retentionSection" style="display:none;">
+      <div class="section-title">📈 Real Audience Retention Curve</div>
+      <svg id="retentionChart" viewBox="0 0 800 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="160" fill="#0a0a0a" rx="6"/>
+        <!-- Chart rendered by JS -->
+      </svg>
+      <div class="retention-insights" id="retentionInsights"></div>
+    </div>
 
     <div class="scores-grid" id="scoresGrid"></div>
 
@@ -678,7 +789,7 @@ async function analyze() {
   const steps = [
     'Fetching video data...',
     'Extracting title, thumbnail, metadata...',
-    'Running Mr B Brain analysis...',
+    'Running Mr Bs Coaches analysis...',
     'Scoring all 10 dimensions...',
     'Building your viral blueprint...'
   ];
@@ -790,7 +901,7 @@ function renderResults(data) {
           </div>
           <div class="score-bar"><div class="score-bar-fill ${barColor(s)}" style="width:${s*10}%"></div></div>
           <p class="score-analysis">${val.analysis}</p>
-          ${val.fix && s < 8 ? `<p class="score-fix">→ ${val.fix}</p>` : ''}
+          ${val.fix && s < 8 ? `<p class="score-fix"><span style="color:#f5b400;font-weight:700;">🧠 Mr B would say:</span> ${val.fix}</p>` : ''}
         </div>
       `;
     }
@@ -862,7 +973,7 @@ function renderResults(data) {
           </div>
           <div class="blueprint-beast">
             <div class="blueprint-label">Mr B's Version</div>
-            ${item.mrbeastVersion}
+            ${item.mrBVersion}
           </div>
         </div>
       </div>
@@ -884,6 +995,260 @@ function renderResults(data) {
   document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 
+
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+async function checkAuthStatus() {
+  try {
+    const r = await fetch('/api/auth/status');
+    const d = await r.json();
+    document.getElementById('ytDisconnectedState').style.display = d.connected ? 'none' : 'flex';
+    document.getElementById('ytConnectedState').style.display    = d.connected ? 'flex' : 'none';
+  } catch(e) {}
+}
+
+function connectYouTube() { window.location.href = '/api/auth/youtube'; }
+
+async function disconnectYouTube() {
+  await fetch('/api/auth/disconnect', { method:'POST' });
+  checkAuthStatus();
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const isUrl = tab === 'url';
+  document.querySelector('.input-section').style.display    = isUrl ? '' : 'none';
+  document.getElementById('screenshotPane').style.display   = isUrl ? 'none' : '';
+}
+
+// ─── SCREENSHOT ───────────────────────────────────────────────────────────────
+let selectedPlatform = 'tiktok';
+
+function selectPlatform(btn) {
+  document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedPlatform = btn.dataset.platform;
+}
+
+function fileSelected(input) {
+  const f = input.files[0];
+  document.getElementById('fileName').textContent = f ? '✅ ' + f.name : '';
+}
+
+// Drag and drop
+const uz = document.getElementById('uploadZone');
+if (uz) {
+  uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('drag'); });
+  uz.addEventListener('dragleave', () => uz.classList.remove('drag'));
+  uz.addEventListener('drop', e => {
+    e.preventDefault(); uz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) {
+      document.getElementById('screenshotFile').files = e.dataTransfer.files;
+      document.getElementById('fileName').textContent = '✅ ' + f.name;
+    }
+  });
+}
+
+async function analyzeScreenshot() {
+  const fileInput = document.getElementById('screenshotFile');
+  if (!fileInput.files[0]) { showError('Please upload a screenshot first'); return; }
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('loading').classList.add('active');
+  document.querySelector('.analyze-btn') && (document.querySelectorAll('.analyze-btn').forEach(b => b.disabled = true));
+
+  const fd = new FormData();
+  fd.append('screenshot', fileInput.files[0]);
+  fd.append('platform', selectedPlatform);
+  fd.append('niche', document.getElementById('screenshotNiche').value);
+
+  const steps = ['Reading screenshot...','Extracting retention data...','Running Mr Bs Coaches analysis...','Building viral blueprint...'];
+  let si = 0;
+  const iv = setInterval(() => { document.getElementById('loadingStep').textContent = steps[++si % steps.length]; }, 1800);
+
+  try {
+    const r = await fetch('/api/analyze-screenshot', { method:'POST', body: fd });
+    const d = await r.json();
+    clearInterval(iv);
+    document.getElementById('loading').classList.remove('active');
+    if (!r.ok || d.error) { showError(d.error || 'Analysis failed'); return; }
+    // Render with screenshot-specific video card
+    renderResults({
+      videoId: null,
+      title: selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1) + ' Video (Screenshot Analysis)',
+      author: selectedPlatform,
+      thumbnail: URL.createObjectURL(fileInput.files[0]),
+      viewCount: d.extracted?.totalViews || '',
+      duration: d.extracted?.avgWatchTime || '',
+      analysis: d.analysis,
+      hasRealRetention: true,
+      screenshotExtracted: d.extracted
+    });
+  } catch(e) {
+    clearInterval(iv);
+    document.getElementById('loading').classList.remove('active');
+    showError('Error: ' + e.message);
+  } finally {
+    document.querySelectorAll('.analyze-btn').forEach(b => b.disabled = false);
+  }
+}
+
+// ─── RETENTION CURVE CHART (pure SVG, zero deps) ─────────────────────────────
+function renderRetentionChart(curve, topDrops) {
+  const svg = document.getElementById('retentionChart');
+  if (!curve || !curve.length) return;
+  const W = 800, H = 160, PAD = { top:10, right:10, bottom:20, left:36 };
+  const cw = W - PAD.left - PAD.right;
+  const ch = H - PAD.top - PAD.bottom;
+
+  // Build path
+  const pts = curve.map((p, i) => {
+    const x = PAD.left + (i / (curve.length-1)) * cw;
+    const y = PAD.top + (1 - p.retentionPct/100) * ch;
+    return [x, y];
+  });
+
+  const pathD = pts.map((p,i) => `${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  // Area fill path
+  const areaD = pathD + ` L${pts[pts.length-1][0].toFixed(1)},${(PAD.top+ch).toFixed(1)} L${PAD.left},${(PAD.top+ch).toFixed(1)} Z`;
+
+  // Y-axis labels
+  const yLabels = [100,75,50,25,0].map(v => {
+    const y = PAD.top + (1 - v/100) * ch;
+    return `<text x="${PAD.left-4}" y="${y+4}" text-anchor="end" fill="#444" font-size="9">${v}%</text>
+            <line x1="${PAD.left}" y1="${y}" x2="${PAD.left+cw}" y2="${y}" stroke="#1a1a1a" stroke-width="1"/>`;
+  }).join('');
+
+  // Drop markers
+  const dropMarkers = (topDrops||[]).map(d => {
+    const idx = curve.findIndex(p => p.timestamp === d.timestamp);
+    if (idx < 0) return '';
+    const x = PAD.left + (idx/(curve.length-1))*cw;
+    return `<line x1="${x}" y1="${PAD.top}" x2="${x}" y2="${PAD.top+ch}" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <text x="${x}" y="${PAD.top-1}" text-anchor="middle" fill="#ff6666" font-size="8">⚠ ${d.timestamp}</text>`;
+  }).join('');
+
+  svg.innerHTML = `
+    <rect width="${W}" height="${H}" fill="#0a0a0a" rx="6"/>
+    <defs>
+      <linearGradient id="retGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00ff88" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${yLabels}
+    <path d="${areaD}" fill="url(#retGrad)"/>
+    <path d="${pathD}" fill="none" stroke="#00ff88" stroke-width="2" stroke-linejoin="round"/>
+    ${dropMarkers}
+  `;
+}
+
+// ─── OVERRIDE analyze() TO USE RETENTION WHEN CONNECTED ──────────────────────
+const _origAnalyze = analyze;
+window.analyze = async function() {
+  const url = document.getElementById('urlInput').value.trim();
+  const niche = document.getElementById('nicheSelect').value;
+  if (!url) { showError('Please paste a video URL'); return; }
+
+  // Check if YouTube + connected
+  const p = url.match(/(?:v=|\/watch\?v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+  const isYT = !!p;
+
+  if (isYT) {
+    const statusR = await fetch('/api/auth/status').then(r=>r.json()).catch(()=>({connected:false}));
+    if (statusR.connected) {
+      // Full retention flow
+      await analyzeWithRetention(p[1], niche);
+      return;
+    }
+  }
+  _origAnalyze();
+};
+
+async function analyzeWithRetention(videoId, niche) {
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('analyzeBtn').disabled = true;
+
+  const steps = ['Fetching video data...','Pulling real retention curve...','Running Mr Bs Coaches on live data...','Building surgical blueprint...','Almost done...'];
+  let si = 0;
+  const iv = setInterval(() => { document.getElementById('loadingStep').textContent = steps[Math.min(++si, steps.length-1)]; }, 1800);
+
+  try {
+    // Fetch retention first
+    const retRes = await fetch('/api/retention', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ videoId }) });
+    const retData = await retRes.json();
+    if (!retRes.ok || retData.error) throw new Error(retData.error || 'Retention fetch failed');
+
+    // Run analysis with retention
+    const anaRes = await fetch('/api/analyze-with-retention', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ videoId, niche, retentionData: retData })
+    });
+    const data = await anaRes.json();
+    clearInterval(iv);
+    document.getElementById('loading').classList.remove('active');
+    if (!anaRes.ok || data.error) { showError(data.error || 'Analysis failed'); return; }
+
+    data._retentionCurve = retData.curve;
+    data._topDrops = retData.topDrops;
+    renderResults(data);
+  } catch(e) {
+    clearInterval(iv);
+    document.getElementById('loading').classList.remove('active');
+    showError(e.message);
+  } finally {
+    document.getElementById('analyzeBtn').disabled = false;
+  }
+}
+
+// ─── PATCH renderResults TO SHOW RETENTION ───────────────────────────────────
+const _origRender = renderResults;
+window.renderResults = function(data) {
+  _origRender(data);
+  const sec = document.getElementById('retentionSection');
+  const insights = document.getElementById('retentionInsights');
+  const ri = data.analysis?.retentionInsights;
+
+  if (data._retentionCurve && data._retentionCurve.length) {
+    renderRetentionChart(data._retentionCurve, data._topDrops);
+    sec.style.display = '';
+  } else if (data.screenshotExtracted?.dropPoints?.length) {
+    // Convert screenshot drop points to renderable format
+    const fakeCurve = (data.screenshotExtracted.dropPoints||[]).map((d,i)=>({ timestamp:d.timestamp, retentionPct:d.pct, ratio: i/10 }));
+    if (fakeCurve.length > 1) { renderRetentionChart(fakeCurve, fakeCurve.slice(0,3).map(d=>({ timestamp:d.timestamp, dropPct:0 }))); sec.style.display=''; }
+  } else {
+    sec.style.display = 'none';
+  }
+
+  if (ri && Array.isArray(ri) && ri.length) {
+    sec.style.display = '';
+    insights.innerHTML = ri.map(r => `
+      <div class="ri-card">
+        <div class="ri-header">
+          <span class="ri-ts">⏱ ${r.timestamp}</span>
+          <span class="ri-drop">−${r.dropPct}% viewers</span>
+        </div>
+        <p class="ri-diagnosis">${r.diagnosis}</p>
+        <p class="ri-fix"><span style="color:#f5b400;font-weight:700;">🧠 Mr B would say:</span> ${r.fix}</p>
+      </div>
+    `).join('');
+  } else {
+    insights.innerHTML = '';
+  }
+};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+checkAuthStatus();
+// Handle ?connected=1 redirect
+if (new URLSearchParams(location.search).get('connected')) {
+  history.replaceState({}, '', '/');
+}
+
 // Allow Enter key
 document.getElementById('urlInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') analyze();
@@ -894,7 +1259,7 @@ document.getElementById('urlInput').addEventListener('keydown', e => {
   <!-- FOOTER -->
   <footer style="text-align:center;padding:2rem 1rem 2.5rem;border-top:1px solid #1a1a1a;margin-top:3rem;">
     <p style="color:#444;font-size:0.82rem;margin-bottom:0.4rem;">
-      © 2026 Mr B's Brain. All rights reserved.
+      © 2026 Mr B's Coaches. All rights reserved.
     </p>
     <p style="color:#333;font-size:0.8rem;">
       Built by 
